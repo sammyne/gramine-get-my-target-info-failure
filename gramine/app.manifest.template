@@ -1,0 +1,42 @@
+libos.entrypoint = "{{ entrypoint }}"
+
+[loader]
+entrypoint = "file:{{ gramine.libos }}"
+env.LD_LIBRARY_PATH = "/lib:{{ arch_libdir }}:/usr/{{ arch_libdir }}"
+
+insecure__use_cmdline_argv = true
+
+# for eventfd test
+# sys.insecure__allow_eventfd = true
+
+[[fs.mounts]]
+type = "chroot"
+path = "/lib"
+uri = "file:{{ gramine.runtimedir() }}"
+
+[[fs.mounts]]
+type = "chroot"
+path = "{{ arch_libdir }}"
+uri = "file:{{ arch_libdir }}"
+
+[[fs.mounts]]
+type = "chroot"
+path = "/usr/{{ arch_libdir }}"
+uri = "file:/usr/{{ arch_libdir }}"
+
+[[fs.mounts]]
+type = "chroot"
+path = "/dev/kmsg"
+uri = "dev:/dev/kmsg"
+
+[sgx]
+nonpie_binary = true
+
+thread_num = 16
+
+trusted_files = [
+  "file:{{ gramine.libos }}",
+  "file:{{ gramine.runtimedir() }}/",
+  "file:{{ entrypoint }}",
+  "file:{{ arch_libdir }}/libgcc_s.so.1",
+]
